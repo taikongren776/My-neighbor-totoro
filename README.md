@@ -2,9 +2,13 @@
 
 一个以《龙猫》雨夜公交站为灵感的实时 Web 3D 场景。使用 Three.js 与 Vite，角色、植物、雨伞、车站与纹理均由代码生成，无需下载外部模型。
 
+![雨の森场景预览](docs/preview.png)
+
 角色建模位于 `src/characters.js`：龙猫采用连续旋转曲面与贴合身体的肚皮纹理，手臂使用变截面曲线建模；小月包含分层头发、五官、衣领、口袋和雨靴。两把伞拥有分片伞面、内侧支架、伞柄与雨珠，并绑定到各自角色，随呼吸同步运动。
 
 ## 本地运行
+
+建议使用 Node.js 22 LTS 或更高版本。
 
 ```sh
 npm install
@@ -17,6 +21,10 @@ npm run dev
 npm run build
 npm run preview
 ```
+
+构建产物位于 `dist/`，可部署到静态网站服务的根路径。Release 的网页压缩包包含预构建文件，解压后使用 HTTP 服务访问；不要直接通过 `file://` 打开。GitHub 自动提供的 Source code 压缩包则需要先安装依赖并构建。
+
+首次发布说明见 [RELEASE_NOTES.md](RELEASE_NOTES.md)。
 
 ## 操作
 
