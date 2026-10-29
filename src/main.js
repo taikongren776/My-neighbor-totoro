@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createCharacters } from './characters.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -54,52 +55,7 @@ const mud = material('#3e5141');
 for(let i=0;i<75;i++){const x=range(-20,20);const z=range(-7,1.3);if(Math.abs(x-1)<4&&z>-1)continue;ellipsoid(scene,mud,[x,range(-.2,-.05),z],[range(.3,1.3),range(.13,.4),range(.3,.9)]);}
 const puddleMat = material('#73948a',.08,{metalness:.65,transparent:true,opacity:.5});
 for(let i=0;i<35;i++){const p = new THREE.Mesh(new THREE.CircleGeometry(range(.15,1.3),36),puddleMat);p.rotation.x=-Math.PI/2;p.scale.y=range(.2,.55);p.position.set(range(-15,15),.025,range(1.5,10));scene.add(p);}
-// A gentle, round silhouette built entirely from geometry.
-const totoro = new THREE.Group();totoro.position.set(1.3,.08,.15);scene.add(totoro);
-ellipsoid(totoro,gray,[0,2.15,0],[1.47,1.95,1.05]);
-ellipsoid(totoro,gray,[0,3.45,.01],[1.15,1.02,.89]);
-ellipsoid(totoro,cream,[0,1.98,.79],[1.16,1.46,.4]);
-for(const side of [-1,1]){
- const ear=ellipsoid(totoro,gray,[side*.69,4.56,-.04],[.235,.72,.25]);ear.rotation.z=side*-.12;
- ellipsoid(totoro,material('#576e66'),[side*.69,4.59,.175],[.12,.48,.035]);
- const arm=ellipsoid(totoro,gray,[side*1.22,2.12,.12],[.39,1.02,.43]);arm.rotation.z=side*.22;
- ellipsoid(totoro,gray,[side*.68,.3,.35],[.56,.33,.7]);
- for(let j=0;j<3;j++)ellipsoid(totoro,material('#c5c4ab'),[side*.68+(j-1)*.15,.23,.96],[.055,.065,.14]);
- ellipsoid(totoro,material('#efefda'),[side*.49,3.66,.789],[.22,.23,.105]);
- ellipsoid(totoro,dark,[side*.465,3.66,.886],[.077,.1,.042]);
- ellipsoid(totoro,material('#fff9db'),[side*.45-.02,3.7,.922],[.025,.031,.014]);
- for(let j=0;j<3;j++)curve(totoro,[[side*.83,3.25+j*.12,.74],[side*1.18,3.24+j*.17,.77],[side*1.68,3.19+j*.23,.8]],.013,dark);
-}
-ellipsoid(totoro,dark,[0,3.49,.961],[.2,.125,.115]);
-curve(totoro,[[-.18,3.23,.898],[0,3.2,.935],[.18,3.23,.898]],.018,dark);
-for(let row=0;row<2;row++){const n=row===0?3:4;for(let j=0;j<n;j++){const x=(j-(n-1)/2)*.46;const y=2.65-row*.42;const z=.79+.4*Math.sqrt(Math.max(.1,1-x*x/1.35-(y-1.98)**2/2.1));curve(totoro,[[x-.13,y-.08,z],[x,y+.035,z+.015],[x+.13,y-.08,z]],.048,gray);}}
-ellipsoid(totoro,gray,[0,.7,-1.0],[.57,.48,.9]);
-// A tiny leaf, wet with rain.
-const leafMat=material('#688c4c',.48,{side:THREE.DoubleSide});
-const leaf=ellipsoid(totoro,leafMat,[.1,4.28,.12],[.47,.05,.27]);leaf.rotation.z=-.2;
-rod(totoro,[.1,4.28,.1],[.23,4.52,.08],.018,leafMat);
-function umbrella(parent, x,y,z, radius, color){
- const g=new THREE.Group();g.position.set(x,y,z);parent.add(g);const positions=[],normals=[],uv=[],indices=[];const seg=72,rings=12;
- for(let j=0;j<=rings;j++){const t=j/rings;for(let i=0;i<=seg;i++){const a=i/seg*Math.PI*2;const r=radius*t;const scallop=Math.cos(a*8)*.035*t**6;positions.push(Math.cos(a)*r,.62*(1-t*t)+scallop,Math.sin(a)*r);uv.push(i/seg,t);}}
- for(let j=0;j<rings;j++)for(let i=0;i<seg;i++){const a=j*(seg+1)+i;indices.push(a,a+seg+1,a+1,a+1,a+seg+1,a+seg+2);}
- const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));geo.setIndex(indices);geo.computeVertexNormals();
- const canopy=new THREE.Mesh(geo,material(color,.44,{side:THREE.DoubleSide,metalness:.16}));canopy.castShadow=true;canopy.receiveShadow=true;g.add(canopy);
- const rib=material('#526b61',.5);for(let i=0;i<8;i++){const a=i/8*Math.PI*2;const points=[];for(let j=0;j<=8;j++){const t=j/8;points.push([Math.cos(a)*radius*t,.635*(1-t*t)+.012,Math.sin(a)*radius*t]);}curve(g,points,.012,rib);}
- rod(g,[0,-2.8,0],[0,.8,0],.027,material('#9a9a7c',.3,{metalness:.6}));curve(g,[[0,-2.8,0],[0,-3.03,0],[.18,-3.13,0],[.3,-2.97,0]],.041,material('#544632'));
- return g;
-}
-const bigUmbrella=umbrella(scene,1.5,5.05,.25,2.1,'#233e36');bigUmbrella.rotation.z=-.095;
-// Satsuki's yellow coat, short hair and little red boots.
-const girl=new THREE.Group();girl.position.set(-1.1,.07,.9);girl.rotation.y=.17;scene.add(girl);
-const yellow=material('#d0a347',.7);const skin=material('#edbf91');const hair=material('#292b25');const boot=material('#8c4936',.5);
-for(const side of [-1,1]){rod(girl,[side*.16,.15,0],[side*.16,.68,0],.105,skin);ellipsoid(girl,boot,[side*.16,.16,.085],[.15,.18,.24]);}
-const coat=new THREE.Mesh(new THREE.ConeGeometry(.48,1.1,32),yellow);coat.position.y=1.02;coat.scale.z=.72;coat.castShadow=true;girl.add(coat);
-ellipsoid(girl,skin,[0,1.77,.02],[.32,.37,.29]);ellipsoid(girl,hair,[0,1.93,-.06],[.35,.27,.31]);
-for(let j=0;j<6;j++)ellipsoid(girl,hair,[(j-2.5)*.105,1.98,.22],[.085,.16,.07]);
-for(const side of [-1,1]){ellipsoid(girl,hair,[side*.29,1.78,0],[.07,.26,.22]);ellipsoid(girl,dark,[side*.115,1.78,.296],[.024,.035,.018]);}
-rod(girl,[-.27,1.39,0],[-.43,.95,.14],.12,yellow);rod(girl,[.27,1.39,.04],[.44,1.25,.35],.12,yellow);ellipsoid(girl,skin,[.43,1.28,.39],[.095,.1,.09]);
-for(let j=0;j<3;j++)ellipsoid(girl,material('#7f733f'),[0,1.27-j*.19,.24+j*.055],[.025,.025,.015]);
-const smallUmbrella=umbrella(scene,-1.03,2.65,1.0,1.04,'#a34f38');smallUmbrella.scale.y=.78;
+const { totoro, girl, bigUmbrella } = createCharacters(scene);
 // The old, illuminated bus stop.
 const stop=new THREE.Group();stop.position.set(4.8,0,.5);stop.rotation.y=.05;scene.add(stop);
 const rust=material('#626f60',.45,{metalness:.45});rod(stop,[0,.1,0],[0,4.45,0],.065,rust);
@@ -142,8 +98,8 @@ for(let i=0;i<45;i++){const m=new THREE.Mesh(new THREE.RingGeometry(.93,1,32),ri
 const glowTex=canvasTexture(64,64,(c)=>{const g=c.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'#fff9cb');g.addColorStop(.12,'#dbea9a');g.addColorStop(.4,'#a7d86b70');g.addColorStop(1,'#87ba5400');c.fillStyle=g;c.fillRect(0,0,64,64);});
 const flies=[];for(let i=0;i<65;i++){const m=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:'#d8ef9a',transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));const base=new THREE.Vector3(range(-10,10),range(.3,4),range(-6,3));m.position.copy(base);m.scale.setScalar(range(.06,.15));scene.add(m);flies.push({mesh:m,base,phase:range(0,6.28)});}
 const homePos=new THREE.Vector3(8.5,5.5,16.5);const homeTarget=new THREE.Vector3(-1.0,2.6,0);
-const shotPositions=[new THREE.Vector3(7,4.8,13.7),new THREE.Vector3(-7.4,4.4,12.4),new THREE.Vector3(3.6,3.8,8.8)];
-const shotTargets=[new THREE.Vector3(1.2,2.65,0),new THREE.Vector3(.8,2.8,0),new THREE.Vector3(.8,2.6,.45)];
+const shotPositions=[new THREE.Vector3(7,4.8,13.7),new THREE.Vector3(-7.4,4.4,12.4),new THREE.Vector3(4.2,4.4,11.6)];
+const shotTargets=[new THREE.Vector3(1.2,2.65,0),new THREE.Vector3(.8,2.8,0),new THREE.Vector3(.8,3.05,.45)];
 let mode='home',shot=0,elapsed=0,shotTime=0,rainLevel=.65,transition=true;
 const desiredPos=homePos.clone(),desiredTarget=homeTarget.clone();
 function responsiveHome(){homePos.set(innerWidth<800?10:8.5,5.5,innerWidth<800?21:16.5);homeTarget.set(innerWidth<800?-.9:-1,2.6,0);}
@@ -171,7 +127,7 @@ $('sound').onclick=async()=>{try{if(!audioCtx){audioCtx=new (window.AudioContext
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);composer.setSize(innerWidth,innerHeight);responsiveHome();if(mode==='home')transition=true;});
 let last=performance.now();
 function animate(now){requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;if(document.hidden)return;elapsed+=dt;
- if(!reducedMotion){totoro.scale.y=1+Math.sin(elapsed*1.25)*.008;bigUmbrella.rotation.z=-.095+Math.sin(elapsed*.7)*.012;}
+ if(!reducedMotion){totoro.scale.y=1+Math.sin(elapsed*1.25)*.008;bigUmbrella.rotation.z=bigUmbrella.userData.restTilt+Math.sin(elapsed*.7)*.003;}
  if(mode==='home'){desiredPos.copy(homePos);if(!reducedMotion)desiredPos.x+=Math.sin(elapsed*.15)*.18;desiredTarget.copy(homeTarget);transition=true;}
  if(mode==='shot'||mode==='cinema'){shotTime+=dt;if(mode==='cinema'&&shotTime>16){selectShot((shot+1)%3,false);mode='cinema';}desiredPos.copy(shotPositions[shot]);desiredTarget.copy(shotTargets[shot]);if(!reducedMotion){const a=shotTime*.035;desiredPos.x+=Math.sin(a)*1.5;desiredPos.z-=Math.sin(shotTime*.07)*.9;}transition=true;}
  if(transition){const factor=1-Math.exp(-dt*1.3);camera.position.lerp(desiredPos,factor);controls.target.lerp(desiredTarget,factor);}controls.update();
