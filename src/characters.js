@@ -173,7 +173,8 @@ export function createCharacters(scene) {
   line(totoro,[[-.13,3.46,front(-.13,3.46,.013)],[0,3.445,front(0,3.445,.014)],[.13,3.46,front(.13,3.46,.013)]],.011,ink);
   // One arm hangs, the other curves forward to grip a pole outside the body.
   swept(totoro,[[-1.24,2.85,-.015],[-1.55,2.35,.08],[-1.62,1.64,.2],[-1.42,1.18,.39]],[.03,.29,.31,.26,.02],fur);
-  for(let j=0;j<3;j++)pointedClaw(totoro,[-1.48+j*.09,1.18,.57],[.2,-1,.6],.12);
+  oval(totoro,fur,[-1.43,1.26,.38],[.24,.26,.24]);
+  for(let j=0;j<3;j++)pointedClaw(totoro,[-1.53+j*.1,1.08,.54],[.2,-1,.6],.12);
   swept(totoro,[[1.24,2.85,-.015],[1.57,2.44,.15],[1.61,2.08,.54],[1.22,2.25,1.02]],[.03,.29,.31,.27,.04],fur);
   oval(totoro,fur,[1.2,2.27,1.04],[.25,.23,.22]);
   for(let j=0;j<3;j++){
